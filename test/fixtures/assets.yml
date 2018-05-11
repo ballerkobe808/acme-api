@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pair: MyString
+  base: MyString
+  quote: MyString
+  altbase: MyString
+  name: MyString
+  marketcap: MyString
+
+two:
+  pair: MyString
+  base: MyString
+  quote: MyString
+  altbase: MyString
+  name: MyString
+  marketcap: MyString

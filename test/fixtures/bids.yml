@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  asset: one
+  price: MyString
+  volume: MyString
+  timestamp: MyString
+
+two:
+  asset: two
+  price: MyString
+  volume: MyString
+  timestamp: MyString

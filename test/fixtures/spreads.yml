@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  asset: one
+  time: MyString
+  bid: MyString
+  ask: MyString
+
+two:
+  asset: two
+  time: MyString
+  bid: MyString
+  ask: MyString
