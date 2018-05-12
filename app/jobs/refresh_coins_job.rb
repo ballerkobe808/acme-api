@@ -6,7 +6,7 @@ class RefreshCoinsJob < ApplicationJob
 
   # rerun the same job, but wait a tiny bit to take a rest lol
   def rerun
-    sleep(3)
+    sleep(5.minutes)
     RefreshCoinsJob.perform_now
   end
 
@@ -23,7 +23,7 @@ class RefreshCoinsJob < ApplicationJob
       # sleep(10)
       # raise "error"
 
-      grab the main assets from kraken
+      # grab the main assets from kraken
       assets_response = RestClient.get 'https://api.kraken.com/0/public/Assets'
       assets_json = JSON.parse(assets_response)['result']
       assets_keys = assets_json.keys
@@ -136,8 +136,9 @@ class RefreshCoinsJob < ApplicationJob
 
           # if there is any issue when getting a coins data - usually the response errored or is null
           # then just move on to the next coin
-        rescue
+        rescue => error
           puts 'single coin refresh error'
+          puts error
           next
         end
       end
@@ -145,8 +146,9 @@ class RefreshCoinsJob < ApplicationJob
       puts "finished refresh coins"
 
     # if there is an error grabbing the coin list, then just restart the job  
-    rescue
+    rescue => error
       puts "coin list refresh error"
+      puts error
       rerun
     end
 
