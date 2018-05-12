@@ -1,8 +1,9 @@
 class AssetsController < ApplicationController
   def index
 
+    # RefreshCoinsJob.perform_later
+
     assets = Asset.all
-    
-    render json: all_assets
+    render json: assets
   end
 end
