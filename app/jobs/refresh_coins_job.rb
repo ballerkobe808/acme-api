@@ -2,7 +2,7 @@ class RefreshCoinsJob < ApplicationJob
   queue_as :default
 
   # infinite loop to keep calling the same job over and over
-  after_perform :rerun
+  # after_perform :rerun
 
   # rerun the same job, but wait a tiny bit to take a rest lol
   def rerun
