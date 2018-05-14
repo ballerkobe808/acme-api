@@ -2,11 +2,11 @@ class RefreshCoinsJob < ApplicationJob
   queue_as :default
 
   # infinite loop to keep calling the same job over and over
-  # after_perform :rerun
+  after_perform :rerun
 
   # rerun the same job, but wait a tiny bit to take a rest lol
   def rerun
-    sleep(5.minutes)
+    sleep(20.minutes)
     RefreshCoinsJob.perform_now
   end
 
@@ -33,12 +33,15 @@ class RefreshCoinsJob < ApplicationJob
       asset_pairs_json = JSON.parse(asset_pairs_response)['result']
       asset_pairs_keys = asset_pairs_json.keys
 
+
+      
       # loop thru the asset pairs that kraken gives us
       asset_pairs_keys.each do |key|
 
         begin
 
-          asset = {"pair" => key, "base" => asset_pairs_json[key]['base'], "quote" => asset_pairs_json[key]['quote']}
+          asset = {"pair" => key, "base" => asset_pairs_json[key]['base'], 
+            "quote" => asset_pairs_json[key]['quote']}
 
           # we only want pairs with a USD currency
           # using "quote" of ZUSD check to say it is a USD pair - is this a valid check??
@@ -54,6 +57,7 @@ class RefreshCoinsJob < ApplicationJob
             assets_keys.each do |key|
               if asset['base'] == key
                 asset['altbase'] = assets_json[key]['altname']
+                asset['display_decimals'] = assets_json[key]['display_decimals']
               end
             end
 
@@ -64,27 +68,37 @@ class RefreshCoinsJob < ApplicationJob
             end
 
             # grab the market cap and full name from a different source
-            ticker_response = RestClient.get 'https://api.coinmarketcap.com/v1/ticker'
-            ticker_json = JSON.parse(ticker_response)
+            market_response = RestClient.get 'https://api.coinmarketcap.com/v1/ticker'
+            market_json = JSON.parse(market_response)
 
             # lookup the full name of the coin using the list from the ticker - 
             # matching based on the altBaseName (since kraken uses its own symbols...)
-            ticker_json.each do |ticker|
-              if ticker['symbol'] == asset['altbase']
-                asset['name'] = ticker['name']
-                asset['marketcap'] = ticker['market_cap_usd']
+            market_json.each do |market|
+              if market['symbol'] == asset['altbase']
+                asset['name'] = market['name']
+                asset['marketcap'] = market['market_cap_usd']
               end
             end
 
+            # grab additional data from kraken
+            ticker_response = RestClient.get 'https://api.kraken.com/0/public/Ticker?pair=' + key
+            ticker_json = JSON.parse(ticker_response)['result'][key]
+ 
+            # puts ticker_json
+            # sleep(10)
+
             # save the asset to the db model
-            asset_db = Asset.new(pair: key, base: asset['base'], quote: asset['quote'], altbase: asset['altbase'], name: asset['name'], marketcap: asset['marketcap'])
+            asset_db = Asset.new(pair: key, base: asset['base'], quote: asset['quote'], 
+              altbase: asset['altbase'], name: asset['name'], marketcap: asset['marketcap'],
+              day_low: ticker_json['l'][0], day_high: ticker_json['h'][0], last_traded: ticker_json['c'][0],
+              opening_price: ticker_json['o'], display_decimals: asset['display_decimals'])
 
             # ok now look up each coin individually and grab the data from kraken
             puts '--pulling coin data from kraken --'
             # we have to wait a certain number of seconds before making calls to kraken or we will exceed our
             # limits and get locked out - if we make one call every 3 seconds we should never exceed the limit
             # https://www.kraken.com/help/api#api-call-rate-limit
-            sleep(3)
+            # sleep(3)
 
             # grab the asks and bids info for this coin and add to the coin in the db
             depth_url = 'https://api.kraken.com/0/public/Depth?pair=' + key
@@ -100,7 +114,7 @@ class RefreshCoinsJob < ApplicationJob
             end
 
             # now wait again before making another call so we dont overload kraken
-            sleep(3)
+            # sleep(3)
 
             # grab the spread info for this coin and add/replace it in the db
             spread_url = 'https://api.kraken.com/0/public/Spread?pair=' + key
@@ -112,7 +126,7 @@ class RefreshCoinsJob < ApplicationJob
             end
 
             # now wait again before making another call so we dont overload kraken
-            sleep(3)
+            # sleep(3)
 
             # grab the trade info for this coin and add/replace it in the db
             trade_url = 'https://api.kraken.com/0/public/Trades?pair=' + key
@@ -120,7 +134,8 @@ class RefreshCoinsJob < ApplicationJob
             trade_json = JSON.parse(trade_response)['result'][key]
 
             trade_json.each do |trade|
-              asset_db.trades.build(price: trade[0], volume: trade[1], time: trade[2], buysell: trade[3], marketlimit: trade[4], misc: trade[5])
+              asset_db.trades.build(price: trade[0], volume: trade[1], time: trade[2], buysell: trade[3], 
+                marketlimit: trade[4], misc: trade[5])
             end
 
             # wrap the delete and insert in a transaction so that there is no lag in case there is
@@ -131,6 +146,9 @@ class RefreshCoinsJob < ApplicationJob
               Asset.where(pair: key).destroy_all
               asset_db.save
             end
+
+            # now wait again before making another call so we dont overload kraken
+            # sleep(3)
 
           end
 

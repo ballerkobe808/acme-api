@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_11_093752) do
+ActiveRecord::Schema.define(version: 2018_05_14_080249) do
 
   create_table "asks", force: :cascade do |t|
     t.integer "asset_id"
@@ -31,6 +31,11 @@ ActiveRecord::Schema.define(version: 2018_05_11_093752) do
     t.string "marketcap"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "day_low"
+    t.string "day_high"
+    t.string "last_traded"
+    t.string "opening_price"
+    t.string "display_decimals"
   end
 
   create_table "bids", force: :cascade do |t|
