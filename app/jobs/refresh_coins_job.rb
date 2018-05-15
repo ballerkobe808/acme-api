@@ -6,7 +6,7 @@ class RefreshCoinsJob < ApplicationJob
 
   # rerun the same job, but wait a tiny bit to take a rest lol
   def rerun
-    sleep(20.minutes)
+    sleep(1.minute)
     RefreshCoinsJob.perform_now
   end
 
@@ -20,9 +20,6 @@ class RefreshCoinsJob < ApplicationJob
     begin
       puts "starting refresh coins"
 
-      # sleep(10)
-      # raise "error"
-
       # grab the main assets from kraken
       assets_response = RestClient.get 'https://api.kraken.com/0/public/Assets'
       assets_json = JSON.parse(assets_response)['result']
@@ -32,12 +29,11 @@ class RefreshCoinsJob < ApplicationJob
       asset_pairs_response = RestClient.get 'https://api.kraken.com/0/public/AssetPairs'
       asset_pairs_json = JSON.parse(asset_pairs_response)['result']
       asset_pairs_keys = asset_pairs_json.keys
-
-
       
       # loop thru the asset pairs that kraken gives us
       asset_pairs_keys.each do |key|
 
+        # wrap every coin in a try catch - if it fails go to the next coin
         begin
 
           asset = {"pair" => key, "base" => asset_pairs_json[key]['base'], 
@@ -67,6 +63,15 @@ class RefreshCoinsJob < ApplicationJob
               asset['altbase'] = 'BTC'
             end
 
+            # look up the assets compliance in the erc20 table
+            erc20 = Erc20.where(symbol: asset['altbase']).first
+            if (erc20)
+              asset['erc20'] = erc20['flag']
+            else
+              asset['erc20'] = 'no data'  
+            end
+
+
             # grab the market cap and full name from a different source
             market_response = RestClient.get 'https://api.coinmarketcap.com/v1/ticker'
             market_json = JSON.parse(market_response)
@@ -84,14 +89,12 @@ class RefreshCoinsJob < ApplicationJob
             ticker_response = RestClient.get 'https://api.kraken.com/0/public/Ticker?pair=' + key
             ticker_json = JSON.parse(ticker_response)['result'][key]
  
-            # puts ticker_json
-            # sleep(10)
-
             # save the asset to the db model
             asset_db = Asset.new(pair: key, base: asset['base'], quote: asset['quote'], 
               altbase: asset['altbase'], name: asset['name'], marketcap: asset['marketcap'],
               day_low: ticker_json['l'][0], day_high: ticker_json['h'][0], last_traded: ticker_json['c'][0],
-              opening_price: ticker_json['o'], display_decimals: asset['display_decimals'])
+              opening_price: ticker_json['o'], display_decimals: asset['display_decimals'],
+              erc20: asset['erc20'])
 
             # ok now look up each coin individually and grab the data from kraken
             puts '--pulling coin data from kraken --'

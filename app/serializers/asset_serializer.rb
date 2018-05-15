@@ -3,7 +3,7 @@
 # and data that wasnt essential. trimming down the data chunk to the bare minimum
 class AssetSerializer < ActiveModel::Serializer
   attributes :name, :altbase, :base, :marketcap, :day_low, :day_high, 
-  :last_traded, :opening_price, :display_decimals
+  :last_traded, :opening_price, :display_decimals, :erc20
 
   # cool thing about Active model serializer is the ability to add child tables with one
   # line. Also defining the child serializer here will take precedence over the serializer

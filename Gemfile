@@ -21,11 +21,14 @@ gem 'puma', '~> 3.11'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
-gem 'rest-client'
-gem 'json'
-gem 'active_model_serializers', '~> 0.10.0'
 
-gem 'faker'
+gem 'rest-client' #easy way to setup a rest api
+gem 'json' #parse the data into json from requests and to client
+gem 'active_model_serializers', '~> 0.10.0' #use this to map the data i send via the rest apis
+gem 'nokogiri' #parse html
+# gem 'open-uri' #open uris to send to nkogiri
+# gem 'certified'
+gem 'faker' #fake data creator
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false

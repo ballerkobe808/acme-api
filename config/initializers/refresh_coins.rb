@@ -1,5 +1,5 @@
 
-puts "starting initializer"
+puts "starting refresh_coins initializer"
 
 Thread.new do
 
@@ -8,4 +8,5 @@ Thread.new do
     RefreshCoinsJob.perform_now
     # sleep(30.minutes)
   # end
+
 end

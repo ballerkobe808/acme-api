@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_14_080249) do
+ActiveRecord::Schema.define(version: 2018_05_15_070706) do
 
   create_table "asks", force: :cascade do |t|
     t.integer "asset_id"
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 2018_05_14_080249) do
     t.string "last_traded"
     t.string "opening_price"
     t.string "display_decimals"
+    t.string "erc20"
   end
 
   create_table "bids", force: :cascade do |t|
@@ -46,6 +47,13 @@ ActiveRecord::Schema.define(version: 2018_05_14_080249) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["asset_id"], name: "index_bids_on_asset_id"
+  end
+
+  create_table "erc20s", force: :cascade do |t|
+    t.string "symbol"
+    t.string "flag"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "spreads", force: :cascade do |t|
