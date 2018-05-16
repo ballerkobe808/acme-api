@@ -1,27 +1,49 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a Ruby on Rails Cryptocurrency api that connects to three different cryptocurrency sources to serve to the ReactJs web client here: https://github.com/ballerkobe808/acme-trader-client
 
-Things you may want to cover:
+The bundled production build of the client comes bundled in the Public folder.
+The three sources this api pull from are:
+ https://www.kraken.com/help/api#public-market-data
+ https://coinmarketcap.com/api
+ https://www.isiterc20.com
 
-* Ruby version
+This was built using:
+Ruby 2.4.1 and Rails 5.2.0
 
-* System dependencies
+Other libraries used are:
+'nokogiri' (http://nokogiri.org/) for parsing the XML response
+'active_model_serializers' (https://github.com/rails-api/active_model_serializers) for serving up data
+'remote_syslog_logger' (https://github.com/papertrail/remote_syslog_logger) for sending logs to papertrail 
 
-* Configuration
+It is also using the default sqlite3 Database
 
-* Database creation
+To get the app up and running:
 
-* Database initialization
+1. Clone the project from Github using:
 
-* How to run the test suite
+  git clone https://github.com/ballerkobe808/acme-api.git
 
-* Services (job queues, cache servers, search engines, etc.)
+2. change to the cloned directory (default is acme-api)
+ 
+  cd acme-api
 
-* Deployment instructions
+3. Install the gemfiles using:
 
-* ...
+  bundle
+
+4. Start the rails server using:
+
+  rails s
+
+5. In development mode, go to:
+
+  localhost:3000 
+
+
+
+Any feedback or questions feel free to email daniel.kong@gmail.com. Thanks for looking!
+
 
 
 
