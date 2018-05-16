@@ -27,7 +27,7 @@ For development, you will need Ruby 2.4.1 and Rails 5.2.0
     $ bundle
 
 
-## Start & watch
+## Start the App
 
     $ rails s
     Point your browser to: http://localhost:3000
