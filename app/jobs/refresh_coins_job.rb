@@ -19,6 +19,7 @@ class RefreshCoinsJob < ApplicationJob
 
     begin
       puts "starting refresh coins"
+      logger.error "starting refresh coins"
 
       # grab the main assets from kraken
       assets_response = RestClient.get 'https://api.kraken.com/0/public/Assets'
@@ -164,8 +165,9 @@ class RefreshCoinsJob < ApplicationJob
           # if there is any issue when getting a coins data - usually the response errored or is null
           # then just move on to the next coin
         rescue => error
-          puts 'single coin refresh error'
-          puts error
+          puts key + ' :single coin refresh error: ' + error
+          logger.error key + ' :single coin refresh error: ' + error
+          # puts error
           next
         end
       end
@@ -174,8 +176,8 @@ class RefreshCoinsJob < ApplicationJob
 
     # if there is an error grabbing the coin list, then just restart the job  
     rescue => error
-      puts "coin list refresh error"
-      puts error
+      puts "coin list refresh error: " + error
+      logger.error  "coin list refresh error: " + error
       rerun
     end
 

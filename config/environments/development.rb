@@ -53,4 +53,5 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   config.log_level = :warn
+  config.logger = RemoteSyslogLogger.new('logs5.papertrailapp.com', 36644)
 end

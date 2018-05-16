@@ -9,6 +9,8 @@ class GetErcDataJob < ApplicationJob
 
     begin
 
+      logger.error "Refreshing ERC20 Data"
+
       # grab the list of coins online
       doc = Nokogiri::HTML(open("https://www.isiterc20.com",{ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE}))   
       # script = doc.css('script')
