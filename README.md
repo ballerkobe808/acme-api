@@ -1,16 +1,16 @@
 
 # ACME API (Bundled with the Acme Trader Client)
 
-This is a Ruby on Rails Cryptocurrency api that connects to three different cryptocurrency sources to serve to the ReactJs web client here: 
+This is a Ruby on Rails Cryptocurrency api built using Ruby on Rails 5 that connects to three different cryptocurrency sources to serve to the ReactJs web client here: 
 
     https://github.com/ballerkobe808/acme-trader-client
 
 The bundled production build of the acme trader client is in the Public folder.
 The three sources this api pulls from are:
 
- https://www.kraken.com/help/api#public-market-data (coin list and graphical data)
- https://coinmarketcap.com/api (coin name and market cap)
- https://www.isiterc20.com (ERC20 flag)
+ - https://www.kraken.com/help/api#public-market-data (coin list and graphical data)
+ - https://coinmarketcap.com/api (coin name and market cap)
+ - https://www.isiterc20.com (ERC20 flag)
 
 
 
