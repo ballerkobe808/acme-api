@@ -14,11 +14,17 @@ The three sources this api pulls from are:
 
 
 
+## Demo
+
+For a demo of the working version of the app visit: https://acme-trader-client.herokuapp.com
+
+---
+
 ## Requirements
 
 For development, it is recommended to use Ruby 2.4.1 and Rails 5.2.0
 
----
+
 
 ## Install the App
 
