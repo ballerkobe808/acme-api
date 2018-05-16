@@ -22,11 +22,13 @@ class RefreshCoinsJob < ApplicationJob
 
       # grab the main assets from kraken
       assets_response = RestClient.get 'https://api.kraken.com/0/public/Assets'
+      puts assets_response['error'] if (!assets_response['result']) 
       assets_json = JSON.parse(assets_response)['result']
       assets_keys = assets_json.keys
 
       # grab the asset pairs from kraken
       asset_pairs_response = RestClient.get 'https://api.kraken.com/0/public/AssetPairs'
+      puts asset_pairs_response['error'] if (!asset_pairs_response['result']) 
       asset_pairs_json = JSON.parse(asset_pairs_response)['result']
       asset_pairs_keys = asset_pairs_json.keys
       
@@ -87,6 +89,7 @@ class RefreshCoinsJob < ApplicationJob
 
             # grab additional data from kraken
             ticker_response = RestClient.get 'https://api.kraken.com/0/public/Ticker?pair=' + key
+            puts ticker_response['error'] if (!ticker_response['result']) 
             ticker_json = JSON.parse(ticker_response)['result'][key]
  
             # save the asset to the db model
@@ -106,6 +109,7 @@ class RefreshCoinsJob < ApplicationJob
             # grab the asks and bids info for this coin and add to the coin in the db
             depth_url = 'https://api.kraken.com/0/public/Depth?pair=' + key
             depth_response = RestClient.get depth_url
+            puts depth_response['error'] if (!depth_response['result']) 
             depth_json = JSON.parse(depth_response)['result'][key]
 
             depth_json['asks'].each do |depth|
@@ -122,6 +126,7 @@ class RefreshCoinsJob < ApplicationJob
             # grab the spread info for this coin and add/replace it in the db
             spread_url = 'https://api.kraken.com/0/public/Spread?pair=' + key
             spread_response = RestClient.get spread_url
+            puts spread_response['error'] if (!spread_response['result']) 
             spread_json = JSON.parse(spread_response)['result'][key]
 
             spread_json.each do |spread|
@@ -134,6 +139,7 @@ class RefreshCoinsJob < ApplicationJob
             # grab the trade info for this coin and add/replace it in the db
             trade_url = 'https://api.kraken.com/0/public/Trades?pair=' + key
             trade_response = RestClient.get trade_url
+            puts trade_response['error'] if (!trade_response['result']) 
             trade_json = JSON.parse(trade_response)['result'][key]
 
             trade_json.each do |trade|

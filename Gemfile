@@ -28,6 +28,7 @@ gem 'active_model_serializers', '~> 0.10.0' #use this to map the data i send via
 gem 'nokogiri' #parse html
 # gem 'open-uri' #open uris to send to nkogiri
 # gem 'certified'
+gem 'lograge' #simplified logging
 gem 'faker' #fake data creator
 
 # Reduces boot times through caching; required in config/boot.rb

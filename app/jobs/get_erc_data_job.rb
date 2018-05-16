@@ -10,7 +10,7 @@ class GetErcDataJob < ApplicationJob
     begin
 
       # grab the list of coins online
-      doc = Nokogiri::HTML(open("https://www.isiterc20.com"))   
+      doc = Nokogiri::HTML(open("https://www.isiterc20.com",{ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE}))   
       # script = doc.css('script')
       # puts script
       # hash 
