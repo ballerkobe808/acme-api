@@ -12,8 +12,11 @@
 
 ActiveRecord::Schema.define(version: 2018_05_15_070706) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "asks", force: :cascade do |t|
-    t.integer "asset_id"
+    t.bigint "asset_id"
     t.string "price"
     t.string "volume"
     t.string "timestamp"
@@ -40,7 +43,7 @@ ActiveRecord::Schema.define(version: 2018_05_15_070706) do
   end
 
   create_table "bids", force: :cascade do |t|
-    t.integer "asset_id"
+    t.bigint "asset_id"
     t.string "price"
     t.string "volume"
     t.string "timestamp"
@@ -57,7 +60,7 @@ ActiveRecord::Schema.define(version: 2018_05_15_070706) do
   end
 
   create_table "spreads", force: :cascade do |t|
-    t.integer "asset_id"
+    t.bigint "asset_id"
     t.string "time"
     t.string "bid"
     t.string "ask"
@@ -67,7 +70,7 @@ ActiveRecord::Schema.define(version: 2018_05_15_070706) do
   end
 
   create_table "trades", force: :cascade do |t|
-    t.integer "asset_id"
+    t.bigint "asset_id"
     t.string "price"
     t.string "volume"
     t.string "time"
@@ -79,4 +82,8 @@ ActiveRecord::Schema.define(version: 2018_05_15_070706) do
     t.index ["asset_id"], name: "index_trades_on_asset_id"
   end
 
+  add_foreign_key "asks", "assets"
+  add_foreign_key "bids", "assets"
+  add_foreign_key "spreads", "assets"
+  add_foreign_key "trades", "assets"
 end

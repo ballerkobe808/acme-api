@@ -5,7 +5,7 @@ This is a Ruby on Rails Cryptocurrency api built using Ruby on Rails 5 that conn
 
     https://github.com/ballerkobe808/acme-trader-client
 
-The bundled production build of the acme trader client is in the Public folder.
+The bundled production build of the acme trader client is located in the Public folder.
 The three sources this api pulls from are:
 
  - https://www.kraken.com/help/api#public-market-data (coin list and graphical data)
@@ -16,23 +16,28 @@ The three sources this api pulls from are:
 
 ## Requirements
 
-For development, you will need Ruby 2.4.1 and Rails 5.2.0
+For development, it is recommended to use Ruby 2.4.1 and Rails 5.2.0
 
 ---
 
-## Install
+## Install the App
 
     $ git clone https://github.com/ballerkobe808/acme-api.git
     $ cd acme-api
     $ bundle
 
+## Build the Database
+The current version of this app uses Postgres. For simple instructions to install Postgres locally to your system you can visit: https://devcenter.heroku.com/articles/heroku-postgresql#local-setup
+
+After Postgres is installed and running you need to create and migrate the database defined in the config/database.yml file.
+
+    $ rake db:create
+    $ rake db:migrate
 
 ## Start the App
 
     $ rails s
     Point your browser to: http://localhost:3000
-
-
 
 ---
 
@@ -66,6 +71,10 @@ Any feedback or questions feel free to email daniel.kong@gmail.com. Thanks for l
 
 
 
+
+
+rake db:create
+rake db:migrate
 
 
 

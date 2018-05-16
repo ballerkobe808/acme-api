@@ -6,7 +6,11 @@ ruby '2.4.1'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.0'
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+# gem 'sqlite3'
+
+# Using postgres instead of sqlite cuz of heroku
+gem 'pg'
+
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -27,7 +31,6 @@ gem 'json' #parse the data into json from requests and to client
 gem 'active_model_serializers', '~> 0.10.0' #use this to map the data i send via the rest apis
 gem 'nokogiri' #parse html
 # gem 'open-uri' #open uris to send to nkogiri
-# gem 'certified'
 gem 'lograge' #simplified logging
 gem 'remote_syslog_logger' #papertrail logging
 gem 'faker' #fake data creator
