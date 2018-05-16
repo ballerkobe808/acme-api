@@ -1,48 +1,67 @@
-# README
 
-This is a Ruby on Rails Cryptocurrency api that connects to three different cryptocurrency sources to serve to the ReactJs web client here: https://github.com/ballerkobe808/acme-trader-client
+# ACME API (Bundled with the Acme Trader Client)
 
-The bundled production build of the client comes bundled in the Public folder.
-The three sources this api pull from are:
- https://www.kraken.com/help/api#public-market-data
- https://coinmarketcap.com/api
- https://www.isiterc20.com
+This is a Ruby on Rails Cryptocurrency api that connects to three different cryptocurrency sources to serve to the ReactJs web client here: 
 
-This was built using:
-Ruby 2.4.1 and Rails 5.2.0
+    https://github.com/ballerkobe808/acme-trader-client
 
-Other libraries used are:
-'nokogiri' (http://nokogiri.org/) for parsing the XML response
-'active_model_serializers' (https://github.com/rails-api/active_model_serializers) for serving up data
-'remote_syslog_logger' (https://github.com/papertrail/remote_syslog_logger) for sending logs to papertrail 
+The bundled production build of the acme trader client is in the Public folder.
+The three sources this api pulls from are:
 
-It is also using the default sqlite3 Database
+ https://www.kraken.com/help/api#public-market-data (coin list and graphical data)
+ https://coinmarketcap.com/api (coin name and market cap)
+ https://www.isiterc20.com (ERC20 flag)
 
-To get the app up and running:
 
-1. Clone the project from Github using:
 
-  git clone https://github.com/ballerkobe808/acme-api.git
+## Requirements
 
-2. change to the cloned directory (default is acme-api)
- 
-  cd acme-api
+For development, you will need Ruby 2.4.1 and Rails 5.2.0
 
-3. Install the gemfiles using:
+---
 
-  bundle
+## Install
 
-4. Start the rails server using:
+    $ git clone https://github.com/ballerkobe808/acme-api.git
+    $ cd acme-api
+    $ bundle
 
-  rails s
 
-5. In development mode, go to:
+## Start & watch
 
-  localhost:3000 
+    $ rails s
+    Point your browser to: http://localhost:3000
+
+
+
+---
+
+## Languages & tools
+
+### Ruby 
+
+- [Ruby](https://www.ruby-lang.org/en/) is used to build the api
+
+### Rails
+
+- [Rails](https://rubyonrails.org/) is used bundled with ruby to serve the api and the static files needed for the app
+
+### Nokogiri
+
+- [Nokogiri](http://nokogiri.org) is used for parsing the HTML page with the ERC20 check
+
+### Active Model Serializers
+
+- [Active Model Serializers](https://github.com/rails-api/active_model_serializers) is used to help with creating and serving a RESTful api
+
+### Remote Sys Logger
+
+- [Remote Sys Logger](https://github.com/papertrail/remote_syslog_logger) is used for sending logs to papertrail 
 
 
 
 Any feedback or questions feel free to email daniel.kong@gmail.com. Thanks for looking!
+
 
 
 
