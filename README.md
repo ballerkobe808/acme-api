@@ -1,7 +1,7 @@
 
 # ACME API (Bundled with the Acme Trader Client)
 
-This is a Ruby on Rails Cryptocurrency api built using Ruby on Rails 5 that connects to three different cryptocurrency sources to serve to the ReactJs web client here: 
+This is a Ruby on Rails Cryptocurrency api built using Ruby on Rails 5 that connects to three different cryptocurrency sources to serve an api used by the ReactJs web client here: 
 
 - https://github.com/ballerkobe808/acme-trader-client
 
