@@ -90,7 +90,7 @@ Rails.application.configure do
   config.log_level = :info
 
   # for Active Job Inline
-  Rails.application.config.active_job.queue_adapter = :inline
+  # Rails.application.config.active_job.queue_adapter = :inline
 
   config.logger = Logger.new(STDOUT)
   # config.logger = RemoteSyslogLogger.new('logs5.papertrailapp.com', 36644)

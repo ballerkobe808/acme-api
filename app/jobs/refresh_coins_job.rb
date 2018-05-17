@@ -168,6 +168,7 @@ class RefreshCoinsJob < ApplicationJob
       if (!json_response['result'])
         logger.error 'ERROR OBJECT AT ' + url
         logger.error json_response['error'][0]
+        return []
       elsif (key != '') 
         return json_response['result'][key]
       else
@@ -179,7 +180,7 @@ class RefreshCoinsJob < ApplicationJob
       # if there was an http error, then show it - however return an empty array, so there is something there
       logger.error 'error retrieving url ------------------ ' + url
       logger.error error
-      return {}
+      return []
     end
   end
 
