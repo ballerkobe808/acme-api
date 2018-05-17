@@ -84,47 +84,66 @@ class RefreshCoinsJob < ApplicationJob
               end
             end
 
+
+            # save the asset to the db model
+            asset_db = Asset.new(pair: key, base: asset['base'], quote: asset['quote'], 
+            altbase: asset['altbase'], name: asset['name'], marketcap: asset['marketcap'],
+            # day_low: ticker_json['l'][0], day_high: ticker_json['h'][0], last_traded: ticker_json['c'][0],
+            # opening_price: ticker_json['o'], 
+            display_decimals: asset['display_decimals'],
+            erc20: asset['erc20'])
+
+
              # ok now look up each coin individually and grab the data from kraken
              logger.info '--pulling coin data from kraken -- (' + key + ')' 
-            #  puts '--pulling coin data from kraken --'
-
 
             # grab additional data from kraken
             ticker_json = get_coin_data('https://api.kraken.com/0/public/Ticker?pair=' + key, key)
 
-            # save the asset to the db model
-            asset_db = Asset.new(pair: key, base: asset['base'], quote: asset['quote'], 
-              altbase: asset['altbase'], name: asset['name'], marketcap: asset['marketcap'],
-              day_low: ticker_json['l'][0], day_high: ticker_json['h'][0], last_traded: ticker_json['c'][0],
-              opening_price: ticker_json['o'], display_decimals: asset['display_decimals'],
-              erc20: asset['erc20'])
+            if (ticker_json != nil)
+              asset_db['last_traded'] = ticker_json['c'][0]
+            end
+            # # save the asset to the db model
+            # asset_db = Asset.new(pair: key, base: asset['base'], quote: asset['quote'], 
+            #   altbase: asset['altbase'], name: asset['name'], marketcap: asset['marketcap'],
+            #   day_low: ticker_json['l'][0], day_high: ticker_json['h'][0], last_traded: ticker_json['c'][0],
+            #   opening_price: ticker_json['o'], display_decimals: asset['display_decimals'],
+            #   erc20: asset['erc20'])
            
             # grab the asks and bids info for this coin and add to the coin in the db
             depth_json = get_coin_data('https://api.kraken.com/0/public/Depth?pair=' + key, key)
 
-            depth_json['asks'].each do |depth|
-              asset_db.asks.build(price: depth[0], volume: depth[1], timestamp: depth[2])
+            if (depth_json != nil)
+              depth_json['asks'].each do |depth|
+                asset_db.asks.build(price: depth[0], volume: depth[1], timestamp: depth[2])
+              end
             end
 
-            depth_json['bids'].each do |depth|
-              asset_db.bids.build(price: depth[0], volume: depth[1], timestamp: depth[2])
+            if (depth_json != nil)
+              depth_json['bids'].each do |depth|
+                asset_db.bids.build(price: depth[0], volume: depth[1], timestamp: depth[2])
+              end
             end
 
             # begin
             # grab the spread info for this coin and add/replace it in the db
             spread_json = get_coin_data('https://api.kraken.com/0/public/Spread?pair=' + key, key)
 
-            spread_json.each do |spread|
-              asset_db.spreads.build(time: spread[0], bid: spread[1], ask: spread[2])
+            if (spread_json != nil)
+              spread_json.each do |spread|
+                asset_db.spreads.build(time: spread[0], bid: spread[1], ask: spread[2])
+              end
             end
 
             # begin
             # grab the trade info for this coin and add/replace it in the db
             trade_json = get_coin_data('https://api.kraken.com/0/public/Trades?pair=' + key, key)
 
-            trade_json.each do |trade|
-              asset_db.trades.build(price: trade[0], volume: trade[1], time: trade[2], buysell: trade[3], 
-                marketlimit: trade[4], misc: trade[5])
+            if (trade_json != nil)
+              trade_json.each do |trade|
+                asset_db.trades.build(price: trade[0], volume: trade[1], time: trade[2], buysell: trade[3], 
+                  marketlimit: trade[4], misc: trade[5])
+              end
             end
 
             # wrap the delete and insert in a transaction so that there is no lag in case there is
@@ -168,7 +187,7 @@ class RefreshCoinsJob < ApplicationJob
       if (!json_response['result'])
         logger.error 'ERROR OBJECT AT ' + url
         logger.error json_response['error'][0]
-        return []
+        return nil
       elsif (key != '') 
         return json_response['result'][key]
       else
@@ -180,7 +199,7 @@ class RefreshCoinsJob < ApplicationJob
       # if there was an http error, then show it - however return an empty array, so there is something there
       logger.error 'error retrieving url ------------------ ' + url
       logger.error error
-      return []
+      return nil
     end
   end
 
