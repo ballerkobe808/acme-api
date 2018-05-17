@@ -107,46 +107,67 @@ class RefreshCoinsJob < ApplicationJob
             # https://www.kraken.com/help/api#api-call-rate-limit
             # sleep(3)
 
-            # grab the asks and bids info for this coin and add to the coin in the db
-            depth_url = 'https://api.kraken.com/0/public/Depth?pair=' + key
-            depth_response = RestClient.get depth_url
-            puts depth_response['error'] if (!depth_response['result']) 
-            depth_json = JSON.parse(depth_response)['result'][key]
+            begin
+              # grab the asks and bids info for this coin and add to the coin in the db
+              depth_url = 'https://api.kraken.com/0/public/Depth?pair=' + key
+              depth_response = RestClient.get depth_url
+              puts depth_response['error'] if (!depth_response['result']) 
+              depth_json = JSON.parse(depth_response)['result'][key]
 
-            depth_json['asks'].each do |depth|
-              asset_db.asks.build(price: depth[0], volume: depth[1], timestamp: depth[2])
+              depth_json['asks'].each do |depth|
+                asset_db.asks.build(price: depth[0], volume: depth[1], timestamp: depth[2])
+              end
+
+              depth_json['bids'].each do |depth|
+                asset_db.bids.build(price: depth[0], volume: depth[1], timestamp: depth[2])
+              end
+            rescue => error
+              puts 'depth refresh error'
+              puts error
+              logger.error "depth refresh error: -------------" 
+              logger.error error
             end
 
-            depth_json['bids'].each do |depth|
-              asset_db.bids.build(price: depth[0], volume: depth[1], timestamp: depth[2])
+
+            begin
+              # grab the spread info for this coin and add/replace it in the db
+              spread_url = 'https://api.kraken.com/0/public/Spread?pair=' + key
+              spread_response = RestClient.get spread_url
+              puts spread_response['error'] if (!spread_response['result']) 
+              spread_json = JSON.parse(spread_response)['result'][key]
+
+              spread_json.each do |spread|
+                asset_db.spreads.build(time: spread[0], bid: spread[1], ask: spread[2])
+              end
+            rescue => error
+              puts 'spread refresh error'
+              puts error
+              logger.error "spread refresh error: -------------" 
+              logger.error error
             end
 
-            # now wait again before making another call so we dont overload kraken
-            # sleep(3)
 
-            # grab the spread info for this coin and add/replace it in the db
-            spread_url = 'https://api.kraken.com/0/public/Spread?pair=' + key
-            spread_response = RestClient.get spread_url
-            puts spread_response['error'] if (!spread_response['result']) 
-            spread_json = JSON.parse(spread_response)['result'][key]
+            
 
-            spread_json.each do |spread|
-              asset_db.spreads.build(time: spread[0], bid: spread[1], ask: spread[2])
+            begin
+              # grab the trade info for this coin and add/replace it in the db
+              trade_url = 'https://api.kraken.com/0/public/Trades?pair=' + key
+              trade_response = RestClient.get trade_url
+              puts trade_response['error'] if (!trade_response['result']) 
+              trade_json = JSON.parse(trade_response)['result'][key]
+
+              trade_json.each do |trade|
+                asset_db.trades.build(price: trade[0], volume: trade[1], time: trade[2], buysell: trade[3], 
+                  marketlimit: trade[4], misc: trade[5])
+              end
+
+            rescue => error
+              puts 'trades refresh error'
+              puts error
+              logger.error "trades refresh error: -------------" 
+              logger.error error
             end
-
-            # now wait again before making another call so we dont overload kraken
-            # sleep(3)
-
-            # grab the trade info for this coin and add/replace it in the db
-            trade_url = 'https://api.kraken.com/0/public/Trades?pair=' + key
-            trade_response = RestClient.get trade_url
-            puts trade_response['error'] if (!trade_response['result']) 
-            trade_json = JSON.parse(trade_response)['result'][key]
-
-            trade_json.each do |trade|
-              asset_db.trades.build(price: trade[0], volume: trade[1], time: trade[2], buysell: trade[3], 
-                marketlimit: trade[4], misc: trade[5])
-            end
+            
 
             # wrap the delete and insert in a transaction so that there is no lag in case there is
             # a request to pull the data in the middle of a delete and insert
