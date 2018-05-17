@@ -1,8 +1,13 @@
 
 puts "starting refresh_coins initializer"
 
+
 Thread.new do
 
-    RefreshCoinsJob.perform_now
 
+  while true do
+    RefreshCoinsJob.perform_now
+    sleep(10.minutes)
+  end
+    
 end

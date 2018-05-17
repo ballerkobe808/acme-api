@@ -6,13 +6,13 @@ class RefreshCoinsJob < ApplicationJob
   end 
 
   # infinite loop to keep calling the same job over and over
-  after_perform :rerun
+  # after_perform :rerun
 
   # rerun the same job, but wait a tiny bit to take a rest lol
-  def rerun
-    sleep(1.minute)
-    RefreshCoinsJob.perform_now
-  end
+  # def rerun
+  #   sleep(1.minute)
+  #   RefreshCoinsJob.perform_now
+  # end
 
   # the big job to do here, is to grab the data of coins we are interested in from kraken, 
   # visit the api at kraken and get all the related information we are interested in 
