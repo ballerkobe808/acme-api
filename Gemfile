@@ -26,7 +26,7 @@ gem 'puma', '~> 3.11'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
-gem 'rest-client' #easy way to setup a rest api
+gem 'rest-client' #easy way to visit a uri and pull data from it
 gem 'json' #parse the data into json from requests and to client
 gem 'active_model_serializers', '~> 0.10.0' #use this to map the data i send via the rest apis
 gem 'nokogiri' #parse html

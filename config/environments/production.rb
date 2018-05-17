@@ -43,7 +43,7 @@ Rails.application.configure do
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
   # config.log_level = :debug
-  config.log_level = :warn
+  
 
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
@@ -84,5 +84,15 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
+
+
+  # user specific configs entered here --------
+  config.log_level = :info
+
+  # for Active Job Inline
+  Rails.application.config.active_job.queue_adapter = :inline
+
+  # config.logger = Logger.new(STDOUT)
   config.logger = RemoteSyslogLogger.new('logs5.papertrailapp.com', 36644)
+
 end

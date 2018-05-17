@@ -52,8 +52,14 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  config.log_level = :warn
+
+  # user specific configs entered here --------
+  config.log_level = :info
   # config.log_level = :debug
 
-  config.logger = RemoteSyslogLogger.new('logs5.papertrailapp.com', 36644)
+  # for Active Job Inline
+  Rails.application.config.active_job.queue_adapter = :inline
+
+  config.logger = Logger.new(STDOUT)
+  # config.logger = RemoteSyslogLogger.new('logs5.papertrailapp.com', 36644)
 end

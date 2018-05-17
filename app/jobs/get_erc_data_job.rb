@@ -43,7 +43,7 @@ class GetErcDataJob < ApplicationJob
 
       
 
-      # grab the list of coins online
+      # grab the list of coins from a file
       # file = File.read("./ERC20.html")
       # doc = Nokogiri::HTML(file)
 

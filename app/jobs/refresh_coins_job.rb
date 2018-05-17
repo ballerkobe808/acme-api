@@ -18,21 +18,22 @@ class RefreshCoinsJob < ApplicationJob
   def perform(*args)
 
     begin
-      puts "starting refresh coins"
-      logger.error "starting refresh coins"
+      logger.info "************ STARTING refresh coins ******************************************"
 
-      # grab the main assets from kraken
-      assets_response = RestClient.get 'https://api.kraken.com/0/public/Assets'
-      puts assets_response['error'] if (!assets_response['result']) 
-      assets_json = JSON.parse(assets_response)['result']
+      # # grab the main assets from kraken
+      assets_json = get_coin_data('https://api.kraken.com/0/public/Assets', '')
       assets_keys = assets_json.keys
 
+
       # grab the asset pairs from kraken
-      asset_pairs_response = RestClient.get 'https://api.kraken.com/0/public/AssetPairs'
-      puts asset_pairs_response['error'] if (!asset_pairs_response['result']) 
-      asset_pairs_json = JSON.parse(asset_pairs_response)['result']
+      asset_pairs_json = get_coin_data('https://api.kraken.com/0/public/AssetPairs', '')
       asset_pairs_keys = asset_pairs_json.keys
-      
+
+      # grab the market cap and full name from a different source
+      market_response = RestClient.get 'https://api.coinmarketcap.com/v1/ticker'
+      market_json = JSON.parse(market_response)
+
+
       # loop thru the asset pairs that kraken gives us
       asset_pairs_keys.each do |key|
 
@@ -74,11 +75,6 @@ class RefreshCoinsJob < ApplicationJob
               asset['erc20'] = 'no data'  
             end
 
-
-            # grab the market cap and full name from a different source
-            market_response = RestClient.get 'https://api.coinmarketcap.com/v1/ticker'
-            market_json = JSON.parse(market_response)
-
             # lookup the full name of the coin using the list from the ticker - 
             # matching based on the altBaseName (since kraken uses its own symbols...)
             market_json.each do |market|
@@ -88,86 +84,48 @@ class RefreshCoinsJob < ApplicationJob
               end
             end
 
+             # ok now look up each coin individually and grab the data from kraken
+             logger.info '--pulling coin data from kraken -- (' + key + ')' 
+            #  puts '--pulling coin data from kraken --'
+
+
             # grab additional data from kraken
-            ticker_response = RestClient.get 'https://api.kraken.com/0/public/Ticker?pair=' + key
-            puts ticker_response['error'] if (!ticker_response['result']) 
-            ticker_json = JSON.parse(ticker_response)['result'][key]
- 
+            ticker_json = get_coin_data('https://api.kraken.com/0/public/Ticker?pair=' + key, key)
+
             # save the asset to the db model
             asset_db = Asset.new(pair: key, base: asset['base'], quote: asset['quote'], 
               altbase: asset['altbase'], name: asset['name'], marketcap: asset['marketcap'],
               day_low: ticker_json['l'][0], day_high: ticker_json['h'][0], last_traded: ticker_json['c'][0],
               opening_price: ticker_json['o'], display_decimals: asset['display_decimals'],
               erc20: asset['erc20'])
+           
+            # grab the asks and bids info for this coin and add to the coin in the db
+            depth_json = get_coin_data('https://api.kraken.com/0/public/Depth?pair=' + key, key)
 
-            # ok now look up each coin individually and grab the data from kraken
-            puts '--pulling coin data from kraken --'
-            # we have to wait a certain number of seconds before making calls to kraken or we will exceed our
-            # limits and get locked out - if we make one call every 3 seconds we should never exceed the limit
-            # https://www.kraken.com/help/api#api-call-rate-limit
-            # sleep(3)
-
-            begin
-              # grab the asks and bids info for this coin and add to the coin in the db
-              depth_url = 'https://api.kraken.com/0/public/Depth?pair=' + key
-              depth_response = RestClient.get depth_url
-              puts depth_response['error'] if (!depth_response['result']) 
-              depth_json = JSON.parse(depth_response)['result'][key]
-
-              depth_json['asks'].each do |depth|
-                asset_db.asks.build(price: depth[0], volume: depth[1], timestamp: depth[2])
-              end
-
-              depth_json['bids'].each do |depth|
-                asset_db.bids.build(price: depth[0], volume: depth[1], timestamp: depth[2])
-              end
-            rescue => error
-              puts 'depth refresh error'
-              puts error
-              logger.error "depth refresh error: -------------" 
-              logger.error error
+            depth_json['asks'].each do |depth|
+              asset_db.asks.build(price: depth[0], volume: depth[1], timestamp: depth[2])
             end
 
-
-            begin
-              # grab the spread info for this coin and add/replace it in the db
-              spread_url = 'https://api.kraken.com/0/public/Spread?pair=' + key
-              spread_response = RestClient.get spread_url
-              puts spread_response['error'] if (!spread_response['result']) 
-              spread_json = JSON.parse(spread_response)['result'][key]
-
-              spread_json.each do |spread|
-                asset_db.spreads.build(time: spread[0], bid: spread[1], ask: spread[2])
-              end
-            rescue => error
-              puts 'spread refresh error'
-              puts error
-              logger.error "spread refresh error: -------------" 
-              logger.error error
+            depth_json['bids'].each do |depth|
+              asset_db.bids.build(price: depth[0], volume: depth[1], timestamp: depth[2])
             end
 
+            # begin
+            # grab the spread info for this coin and add/replace it in the db
+            spread_json = get_coin_data('https://api.kraken.com/0/public/Spread?pair=' + key, key)
 
-            
-
-            begin
-              # grab the trade info for this coin and add/replace it in the db
-              trade_url = 'https://api.kraken.com/0/public/Trades?pair=' + key
-              trade_response = RestClient.get trade_url
-              puts trade_response['error'] if (!trade_response['result']) 
-              trade_json = JSON.parse(trade_response)['result'][key]
-
-              trade_json.each do |trade|
-                asset_db.trades.build(price: trade[0], volume: trade[1], time: trade[2], buysell: trade[3], 
-                  marketlimit: trade[4], misc: trade[5])
-              end
-
-            rescue => error
-              puts 'trades refresh error'
-              puts error
-              logger.error "trades refresh error: -------------" 
-              logger.error error
+            spread_json.each do |spread|
+              asset_db.spreads.build(time: spread[0], bid: spread[1], ask: spread[2])
             end
-            
+
+            # begin
+            # grab the trade info for this coin and add/replace it in the db
+            trade_json = get_coin_data('https://api.kraken.com/0/public/Trades?pair=' + key, key)
+
+            trade_json.each do |trade|
+              asset_db.trades.build(price: trade[0], volume: trade[1], time: trade[2], buysell: trade[3], 
+                marketlimit: trade[4], misc: trade[5])
+            end
 
             # wrap the delete and insert in a transaction so that there is no lag in case there is
             # a request to pull the data in the middle of a delete and insert
@@ -178,33 +136,51 @@ class RefreshCoinsJob < ApplicationJob
               asset_db.save
             end
 
-            # now wait again before making another call so we dont overload kraken
-            # sleep(3)
-
           end
 
           # if there is any issue when getting a coins data - usually the response errored or is null
           # then just move on to the next coin
         rescue => error
-          puts key + ' :single coin refresh error-------------: '
-          puts error
-          logger.error key + ' :single coin refresh error-----------: ' 
+          logger.error 'SINGLE coin refresh error-----------: ' + key
           logger.error error
-          # puts error
           next
         end
       end
 
-      puts "finished refresh coins"
+      logger.info "*********** FINISHED refresh coins ******************************************"
 
     # if there is an error grabbing the coin list, then just restart the job  
     rescue => error
-      puts "coin list refresh error: " 
-      puts error
-      logger.error "coin list refresh error: -------------" 
+      logger.error "GENERAL coin list refresh error: -------------" 
       logger.error error
       rerun
     end
 
   end
+
+
+  # get the json from the url - we are assuming the kraken api, and the data
+  # back in a specific format
+  def get_coin_data(url, key)
+    begin
+      response = RestClient.get url
+      json_response = JSON.parse(response)
+      if (!json_response['result'])
+        logger.error 'ERROR OBJECT AT ' + url
+        logger.error json_response['error'][0]
+      elsif (key != '') 
+        return json_response['result'][key]
+      else
+        # otherwise return w/o looking for a key
+        return json_response['result']
+      end
+
+    rescue => error
+      # if there was an http error, then show it - however return an empty array, so there is something there
+      logger.error 'error retrieving url ------------------ ' + url
+      logger.error error
+      return {}
+    end
+  end
+
 end
