@@ -34,6 +34,7 @@ gem 'nokogiri' #parse html
 gem 'lograge' #simplified logging
 gem 'remote_syslog_logger' #papertrail logging
 gem 'faker' #fake data creator
+gem 'sidekiq' #job runner to run active jobs with more options
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false

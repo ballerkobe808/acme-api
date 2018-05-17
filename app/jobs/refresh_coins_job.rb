@@ -1,5 +1,9 @@
 class RefreshCoinsJob < ApplicationJob
-  queue_as :default
+  queue_as :low_priority
+
+  rescue_from(StandardError) do
+    retry_job wait: 5.minutes, queue: :low_priority 
+  end 
 
   # infinite loop to keep calling the same job over and over
   after_perform :rerun
@@ -172,7 +176,7 @@ class RefreshCoinsJob < ApplicationJob
     rescue => error
       logger.error "GENERAL coin list refresh error: -------------" 
       logger.error error
-      rerun
+      raise StandardError.new("STANDARD ERROR")
     end
 
   end

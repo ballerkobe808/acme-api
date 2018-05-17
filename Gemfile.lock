@@ -55,6 +55,7 @@ GEM
     case_transform (0.2)
       activesupport
     concurrent-ruby (1.0.5)
+    connection_pool (2.2.1)
     crass (1.0.4)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
@@ -102,6 +103,8 @@ GEM
     pg (1.0.0)
     puma (3.11.4)
     rack (2.0.5)
+    rack-protection (2.0.1)
+      rack
     rack-test (1.0.0)
       rack (>= 1.0, < 3)
     rails (5.2.0)
@@ -132,6 +135,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
+    redis (4.0.1)
     remote_syslog_logger (1.0.3)
       syslog_protocol
     request_store (1.4.1)
@@ -141,6 +145,11 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     ruby_dep (1.5.0)
+    sidekiq (5.1.3)
+      concurrent-ruby (~> 1.0)
+      connection_pool (~> 2.2, >= 2.2.0)
+      rack-protection (>= 1.5.0)
+      redis (>= 3.3.5, < 5)
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-watcher-listen (2.0.1)
@@ -182,6 +191,7 @@ DEPENDENCIES
   rails (~> 5.2.0)
   remote_syslog_logger
   rest-client
+  sidekiq
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data

@@ -85,14 +85,4 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
 
-
-  # user specific configs entered here --------
-  config.log_level = :info
-
-  # for Active Job Inline
-  # Rails.application.config.active_job.queue_adapter = :inline
-
-  config.logger = Logger.new(STDOUT)
-  # config.logger = RemoteSyslogLogger.new('logs5.papertrailapp.com', 36644)
-
 end

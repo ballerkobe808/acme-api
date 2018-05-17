@@ -34,5 +34,18 @@ module AcmeApi
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+
+    # user specific configs entered here --------
+    config.log_level = :info
+    # config.log_level = :debug
+
+    # for Active Job Inline
+    # config.active_job.queue_adapter = :inline
+    config.active_job.queue_adapter = :sidekiq
+    
+    config.logger = Logger.new(STDOUT)
+    # config.logger = RemoteSyslogLogger.new('logs5.papertrailapp.com', 36644)
+    
   end
 end
