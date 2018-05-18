@@ -92,8 +92,6 @@ class RefreshCoinsJob < ApplicationJob
             # save the asset to the db model
             asset_db = Asset.new(pair: key, base: asset['base'], quote: asset['quote'], 
             altbase: asset['altbase'], name: asset['name'], marketcap: asset['marketcap'],
-            # day_low: ticker_json['l'][0], day_high: ticker_json['h'][0], last_traded: ticker_json['c'][0],
-            # opening_price: ticker_json['o'], 
             display_decimals: asset['display_decimals'],
             erc20: asset['erc20'])
 
@@ -107,12 +105,6 @@ class RefreshCoinsJob < ApplicationJob
             if (ticker_json != nil)
               asset_db['last_traded'] = ticker_json['c'][0]
             end
-            # # save the asset to the db model
-            # asset_db = Asset.new(pair: key, base: asset['base'], quote: asset['quote'], 
-            #   altbase: asset['altbase'], name: asset['name'], marketcap: asset['marketcap'],
-            #   day_low: ticker_json['l'][0], day_high: ticker_json['h'][0], last_traded: ticker_json['c'][0],
-            #   opening_price: ticker_json['o'], display_decimals: asset['display_decimals'],
-            #   erc20: asset['erc20'])
            
             # grab the asks and bids info for this coin and add to the coin in the db
             depth_json = get_coin_data('https://api.kraken.com/0/public/Depth?pair=' + key, key)

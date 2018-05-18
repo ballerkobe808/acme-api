@@ -9,23 +9,23 @@ class GetErcDataJob < ApplicationJob
 
     begin
 
-      logger.error "Refreshing ERC20 Data"
+      logger.info "Refreshing ERC20 Data"
 
       # grab the list of coins online
       doc = Nokogiri::HTML(open("https://www.isiterc20.com",{ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE}))   
-      # script = doc.css('script')
-      # puts script
-      # hash 
 
+      # The data is stored in a js variable named currencies. it looks like an angular page and the
+      # html is dynamically added as the user scrolls. because of this, we cant scrape the html.
+      # But we can get the data we need from the js
       doc.css('script').each do |script|
         if script.content.include? "var currencies ="
-          # puts script.content
 
+          # scrub the data to just the json of the coins and the related data
           json_string = script.content.gsub('var currencies =', '')
           json_string = json_string.gsub('];', ']')
-
           hash = JSON.parse json_string
-          
+
+          # loop thru the data and grab the erc20 flag
           hash.each do |row|
             # add the coin if it doesnt exist, otherwise update it
             new_coin = Erc20.find_or_initialize_by(symbol: row['code'])
@@ -35,7 +35,6 @@ class GetErcDataJob < ApplicationJob
               new_coin.flag = 'Yes'
             end
             new_coin.save
-            # puts row['code']
           end
         end
         
